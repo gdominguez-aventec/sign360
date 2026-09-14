@@ -5,7 +5,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      // URL del backend Django (avsis-docsign/backend)
+      // URL del backend Django (sign360/backend)
       apiHost: process.env.NUXT_PUBLIC_API_HOST || 'http://localhost:8000',
       defaultLocale: process.env.LANGUAGE || 'ca',
       env: process.env.ENV || 'local',
@@ -43,7 +43,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'Docsign',
+      title: 'Sign360',
       meta: [{ name: 'description', content: 'Gestió i signatura de documents' }],
     },
   },

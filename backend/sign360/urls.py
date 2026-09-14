@@ -3,11 +3,11 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from docsign.views import root_view
+from sign360.views import root_view
 
 app_urls = [
     path("admin/", admin.site.urls),
-    path("auth/", include("auth_docsign.urls")),
+    path("auth/", include("auth_sign360.urls")),
     path("documentmanager/", include("documentmanager.urls")),
     path("signing/", include("integrations.urls")),
 ]

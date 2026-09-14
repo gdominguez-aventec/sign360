@@ -3,7 +3,7 @@ from django.conf import settings
 # Prefix per a l'`external_reference` de les sessions de signatura, per evitar
 # col·lisions amb l'id numèric de qualsevol altra entitat que el proveïdor
 # pugui fer servir com a referència.
-DOCUMENT_SIGN_REFERENCE_PREFIX = "docsign-"
+DOCUMENT_SIGN_REFERENCE_PREFIX = "sign360-"
 
 
 def build_external_reference(document_sign):

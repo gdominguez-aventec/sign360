@@ -1,6 +1,6 @@
 export default {
   app: {
-    name: 'Docsign',
+    name: 'Sign360',
     subtitle: 'Gestió i signatura de documents',
   },
   common: {

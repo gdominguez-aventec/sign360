@@ -1,5 +1,5 @@
 """
-Django settings for docsign project.
+Django settings for the sign360 project.
 
 Segueix les mateixes convencions que `avsis-customers-backend`: configuració via
 `python-decouple` (fitxer `.env`), PostgreSQL, DRF amb TokenAuthentication i
@@ -53,7 +53,7 @@ SIGNING_TIMEOUT = config("SIGNING_TIMEOUT", default=30, cast=int)
 SIGN_CALLBACK_API_KEY = config("SIGN_CALLBACK_API_KEY", default="")
 
 OWN_APPS = [
-    "auth_docsign",
+    "auth_sign360",
     "documentmanager",
     "integrations",
 ]
@@ -91,7 +91,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "docsign.urls"
+ROOT_URLCONF = "sign360.urls"
 
 TEMPLATES = [
     {
@@ -109,14 +109,14 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "docsign.wsgi.application"
+WSGI_APPLICATION = "sign360.wsgi.application"
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config("DATABASE_NAME", default="avsis-docsign"),
-        "USER": config("DATABASE_USER", default="docsign"),
-        "PASSWORD": config("DATABASE_PASSWORD", default="docsign"),
+        "NAME": config("DATABASE_NAME", default="sign360"),
+        "USER": config("DATABASE_USER", default="sign360"),
+        "PASSWORD": config("DATABASE_PASSWORD", default="sign360"),
         "HOST": config("DATABASE_HOST", default="localhost"),
         "PORT": config("DATABASE_PORT", default="5432"),
     }
@@ -198,7 +198,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(LOG_DIR, "docsign.log"),
+            "filename": os.path.join(LOG_DIR, "sign360.log"),
             "maxBytes": 5 * 1024 * 1024,
             "backupCount": 5,
             "formatter": "verbose",

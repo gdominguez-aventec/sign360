@@ -1,15 +1,30 @@
-# avsis-docsign
+# Sign360
 
-Aplicació per **consultar, carregar i firmar documents**. Segueix les mateixes
-convencions que `avsis-customers-backend` / `avsis-customers-frontend`: Django +
-DRF al backend i Nuxt 3 (Vue 3) al frontal.
+**Sign360 is a standalone web application for reviewing, uploading and
+electronically signing documents.** Users upload a PDF, name the signer, and the
+document is sent out for signature through an external signing provider, which
+delivers a one-time password to the signer by email or SMS. Sign360 tracks every
+request through its lifecycle — pending, sent, signed, expired or failed — and
+stores the signed copy alongside the original, so both remain available for
+download at any time. Each exchange with the provider is logged, giving a full
+audit trail of who was asked to sign what, and when.
+
+The application is built with Django and Django REST Framework on the back end
+and Nuxt 3 (Vue 3) on the front end, following the same conventions as the
+Aqua360 Customers platform. It runs on its own database with its own users and
+has no runtime dependency on any other Aventec system.
+
+---
+
+Segueix les mateixes convencions que `avsis-customers-backend` /
+`avsis-customers-frontend`: Django + DRF al backend i Nuxt 3 (Vue 3) al frontal.
 
 És un projecte **autònom**: té la seva base de dades i els seus usuaris, i no
 depèn de la instal·lació d'avsis. L'única dependència externa és l'API de
 signatura (Aqua360 Sign), la mateixa que fa servir avsis.
 
 ```
-avsis-docsign/
+sign360/
 ├── backend/     Django 5 + DRF + PostgreSQL + Celery
 └── frontend/    Nuxt 3 + Tailwind + Pinia + i18n
 ```

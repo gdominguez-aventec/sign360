@@ -1,6 +1,6 @@
 export default {
   app: {
-    name: 'Docsign',
+    name: 'Sign360',
     subtitle: 'Document management and signing',
   },
   common: {
