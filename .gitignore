@@ -1,0 +1,40 @@
+# --- Python / Django (backend) ---
+__pycache__/
+*.py[co]
+*.so
+.Python
+env/
+venv/
+.venv/
+backend/media/
+backend/static/
+backend/logs/
+*.sqlite3
+*.log
+*.mo
+*.pot
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+
+# --- Node / Nuxt (frontend) ---
+node_modules
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# --- Entorn ---
+.env
+.env.*
+!.env.example
+
+# --- Eines ---
+.vscode/
+.idea/
+*.iml
+.DS_Store
+*:Zone.Identifier
+.claude/settings.local.json

@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-avsis-docsign}
+      POSTGRES_USER: ${DATABASE_USER:-docsign}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-docsign}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_HOST: db
+      CELERY_BROKER_URL: redis://redis:6379/0
+    volumes:
+      - media_data:/app/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        NUXT_PUBLIC_API_HOST: ${NUXT_PUBLIC_API_HOST:-http://localhost:8000}
+        NUXT_PUBLIC_ENV: ${ENV:-local}
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
+  media_data:

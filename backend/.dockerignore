@@ -1,0 +1,10 @@
+__pycache__/
+*.py[co]
+.env
+env/
+venv/
+.venv/
+media/
+logs/
+static/
+.git/
