@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from rest_framework import serializers
 
 from .models import (
@@ -167,6 +168,13 @@ class DocumentSignCreateSerializer(serializers.Serializer):
 
         if not isinstance(raw, list) or not raw:
             raise serializers.ValidationError("Cal com a mínim un signant.")
+
+        # La signatura encadenada està implementada però desactivada per
+        # configuració; mentre ho estigui, només s'admet un signant.
+        if len(raw) > 1 and not getattr(settings, "MULTI_SIGNER_ENABLED", False):
+            raise serializers.ValidationError(
+                "La signatura per part de més d'una persona està desactivada."
+            )
 
         serializer = SignerInputSerializer(data=raw, many=True)
         serializer.is_valid(raise_exception=True)

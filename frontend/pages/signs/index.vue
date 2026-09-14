@@ -6,6 +6,11 @@ const toast = useToast()
 const { $DocumentSignApiService } = useNuxtApp()
 const { SIGN_STATUS, label, badgeClass, icon, canSend } = useSignStatus()
 const { formatDateTime } = useFormatDate()
+const configStore = useConfigStore()
+
+// Amb la signatura multipersona apagada, les columnes de progrés i de torn no
+// aporten res: només hi ha un signant.
+const multiSigner = computed(() => configStore.multiSignerEnabled)
 
 const items = ref([])
 const count = ref(0)
@@ -82,7 +87,10 @@ const onUploaded = async () => {
   await load()
 }
 
-onMounted(load)
+onMounted(async () => {
+  await configStore.load()
+  await load()
+})
 </script>
 
 <template>
@@ -143,8 +151,10 @@ onMounted(load)
           <tr class="text-left text-gray-500 uppercase tracking-wide">
             <th class="px-4 py-2 font-medium">{{ $t('sign.doc_title') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.documents') }}</th>
-            <th class="px-4 py-2 font-medium">{{ $t('sign.signers') }}</th>
-            <th class="px-4 py-2 font-medium">{{ $t('sign.next_signer') }}</th>
+            <th class="px-4 py-2 font-medium">
+              {{ multiSigner ? $t('sign.signers') : $t('sign.signer') }}
+            </th>
+            <th v-if="multiSigner" class="px-4 py-2 font-medium">{{ $t('sign.next_signer') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.status') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.created_at') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.signed_at') }}</th>
@@ -153,12 +163,12 @@ onMounted(load)
         </thead>
         <tbody class="divide-y divide-gray-100">
           <tr v-if="loading">
-            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+            <td :colspan="multiSigner ? 8 : 7" class="px-4 py-8 text-center text-gray-500">
               {{ $t('common.loading') }}
             </td>
           </tr>
           <tr v-else-if="items.length === 0">
-            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+            <td :colspan="multiSigner ? 8 : 7" class="px-4 py-8 text-center text-gray-500">
               {{ $t('sign.empty') }}
             </td>
           </tr>
@@ -178,9 +188,13 @@ onMounted(load)
               </span>
             </td>
             <td class="px-4 py-2 text-gray-700">
-              {{ signedCount(item) }} / {{ item.signers_count }}
+              <template v-if="multiSigner">{{ signedCount(item) }} / {{ item.signers_count }}</template>
+              <template v-else>
+                <div>{{ item.signers[0]?.name }}</div>
+                <div class="text-gray-500">{{ item.signers[0]?.email }}</div>
+              </template>
             </td>
-            <td class="px-4 py-2">
+            <td v-if="multiSigner" class="px-4 py-2">
               <span v-if="item.next_signer" class="text-gray-700">
                 {{ item.next_signer.order }}. {{ item.next_signer.name }}
               </span>
@@ -210,7 +224,7 @@ onMounted(load)
                   v-if="canSend(item.status) && item.next_signer"
                   type="button"
                   class="text-gray-500 hover:text-indigo-600 disabled:opacity-50"
-                  :title="$t('sign.send_next')"
+                  :title="multiSigner ? $t('sign.send_next') : $t('sign.send_to_sign')"
                   :disabled="sendingId === item.id"
                   @click="sendToSign(item)"
                 >

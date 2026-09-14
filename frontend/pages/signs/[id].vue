@@ -7,6 +7,10 @@ const route = useRoute()
 const { $DocumentSignApiService } = useNuxtApp()
 const { SIGN_STATUS, label, badgeClass, icon, canSend } = useSignStatus()
 const { formatDateTime, formatSize } = useFormatDate()
+const configStore = useConfigStore()
+
+// Amb la signatura multipersona apagada no hi ha cadena: només un signant.
+const multiSigner = computed(() => configStore.multiSignerEnabled)
 
 const id = route.params.id
 const item = ref(null)
@@ -116,7 +120,10 @@ const downloadOriginal = (doc) =>
 
 watch(selectedVersion, loadPdf)
 
-onMounted(load)
+onMounted(async () => {
+  await configStore.load()
+  await load()
+})
 onBeforeUnmount(releaseUrl)
 </script>
 
@@ -240,7 +247,10 @@ onBeforeUnmount(releaseUrl)
               @click="sendToSign()"
             >
               <Icon name="fa6-solid:paper-plane" class="w-3 h-3 mr-1" />
-              {{ $t('sign.send_next') }}: {{ item.next_signer.name }}
+              <template v-if="multiSigner">
+                {{ $t('sign.send_next') }}: {{ item.next_signer.name }}
+              </template>
+              <template v-else>{{ $t('sign.send_to_sign') }}</template>
             </button>
             <button
               type="button"
@@ -254,8 +264,10 @@ onBeforeUnmount(releaseUrl)
 
         <!-- Cadena de signants -->
         <div class="bg-white rounded-lg border border-gray-200 p-4">
-          <h2 class="font-semibold text-gray-700">{{ $t('sign.signers') }}</h2>
-          <p class="mt-1 text-gray-500">{{ $t('sign.chain_note') }}</p>
+          <h2 class="font-semibold text-gray-700">
+            {{ multiSigner ? $t('sign.signers') : $t('sign.signer') }}
+          </h2>
+          <p v-if="multiSigner" class="mt-1 text-gray-500">{{ $t('sign.chain_note') }}</p>
 
           <ol class="mt-3 space-y-2">
             <li
@@ -267,7 +279,8 @@ onBeforeUnmount(releaseUrl)
                 class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full font-semibold ring-1 ring-inset"
                 :class="badgeClass(signer.status)"
               >
-                {{ signer.order }}
+                <template v-if="multiSigner">{{ signer.order }}</template>
+                <Icon v-else :name="icon(signer.status)" class="w-3 h-3" />
               </span>
               <div class="min-w-0 flex-1">
                 <div class="font-medium text-gray-900 truncate">{{ signer.name }}</div>

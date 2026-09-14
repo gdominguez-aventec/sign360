@@ -7,6 +7,13 @@ const { t } = useI18n()
 const toast = useToast()
 const { $DocumentSignApiService } = useNuxtApp()
 const { formatSize } = useFormatDate()
+const configStore = useConfigStore()
+
+// La signatura per part de més d'una persona està darrere d'un interruptor del
+// backend: mentre estigui apagat, el formulari només mostra un signant.
+const multiSigner = computed(() => configStore.multiSignerEnabled)
+
+onMounted(() => configStore.load())
 
 const files = ref([])
 const title = ref('')
@@ -37,7 +44,10 @@ const addFiles = (event) => {
 
 const removeFile = (index) => files.value.splice(index, 1)
 
-const addSigner = () => signers.value.push({ name: '', email: '', phone: '' })
+const addSigner = () => {
+  if (!multiSigner.value) return
+  signers.value.push({ name: '', email: '', phone: '' })
+}
 const removeSigner = (index) => {
   if (signers.value.length > 1) signers.value.splice(index, 1)
 }
@@ -154,8 +164,11 @@ const submit = async () => {
         <!-- Signants -->
         <fieldset class="border-t border-gray-200 pt-3">
           <div class="flex items-center justify-between">
-            <legend class="font-semibold text-gray-700">{{ $t('sign.signers') }} *</legend>
+            <legend class="font-semibold text-gray-700">
+              {{ multiSigner ? $t('sign.signers') : $t('sign.signer') }} *
+            </legend>
             <button
+              v-if="multiSigner"
               type="button"
               class="rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-700 hover:bg-gray-50"
               @click="addSigner"
@@ -163,7 +176,7 @@ const submit = async () => {
               <Icon name="fa6-solid:plus" class="w-3 h-3 mr-1" />{{ $t('sign.add_signer') }}
             </button>
           </div>
-          <p class="mt-1 text-gray-500">{{ $t('sign.chain_note') }}</p>
+          <p v-if="multiSigner" class="mt-1 text-gray-500">{{ $t('sign.chain_note') }}</p>
 
           <div
             v-for="(signer, index) in signers"
@@ -171,6 +184,7 @@ const submit = async () => {
             class="mt-2 flex items-start gap-2 rounded-md border border-gray-200 p-2"
           >
             <span
+              v-if="multiSigner"
               class="mt-1.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-50 font-semibold text-indigo-700"
             >
               {{ index + 1 }}
@@ -198,6 +212,7 @@ const submit = async () => {
               />
             </div>
             <button
+              v-if="multiSigner"
               type="button"
               class="mt-1.5 shrink-0 text-gray-400 hover:text-red-600 disabled:opacity-30"
               :disabled="signers.length === 1"

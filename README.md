@@ -73,6 +73,22 @@ documents amb els nostres. És necessari perquè, amb més d'un document per ses
 el webhook ha de saber a quin correspon cada PDF firmat. Es construeix per nom de
 fitxer i, si el proveïdor no el retorna, per l'ordre en què els hem enviat.
 
+### Signatura per part de més d'una persona (desactivada)
+
+El model i el flux encadenat estan implementats i provats, però **de moment estan
+desactivats**: `MULTI_SIGNER_ENABLED=False` limita cada sol·licitud a un signant.
+
+L'interruptor viu al backend, que és qui el valida, i el frontal el llegeix de
+`GET /documentmanager/config/` en lloc de tenir la seva pròpia variable, perquè
+no hi hagi dues fonts de veritat que puguin divergir. Amb l'interruptor apagat
+s'amaguen el botó d'afegir signants, la seqüència de torns i les columnes de
+progrés; el backend rebutja qualsevol alta amb més d'un signant encara que se li
+enviï directament per l'API.
+
+Per reactivar-ho només cal posar `MULTI_SIGNER_ENABLED=True` al `.env` i
+reiniciar. No cal tocar codi ni migrar res: el model ja guarda l'ordre dels
+signants i la cadena de versions.
+
 ### Si un torn caduca o falla
 
 L'estat viu a dos nivells: el del signant i el de la sol·licitud. Un torn caducat
@@ -100,6 +116,7 @@ python manage.py runserver
 |---|---|---|
 | `POST` | `/auth/login/` | Login; retorna el token DRF |
 | `GET` | `/auth/me/` | Usuari actual |
+| `GET` | `/documentmanager/config/` | Configuració per al frontal (multisignant, mida màxima, proveïdor configurat) |
 | `GET` | `/documentmanager/document-sign/` | Llista (filtres: `search`, `status`, `signer_email`) |
 | `POST` | `/documentmanager/document-sign/` | Alta: N fitxers a `files` i els signants com a JSON a `signers` |
 | `POST` | `/documentmanager/document-sign/<id>/send-to-sign/` | Envia al signant de torn (o a un de concret amb `signer`) |

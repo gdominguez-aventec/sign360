@@ -39,6 +39,12 @@ LANGUAGE = config("LANGUAGE", default="ca")
 # Mida màxima acceptada en pujar un document (bytes)
 DOCUMENT_MAX_UPLOAD_SIZE = config("DOCUMENT_MAX_UPLOAD_SIZE", default=20 * 1024 * 1024, cast=int)
 
+# Signatura per part de més d'una persona (cadena de signants).
+# El model i el flux encadenat estan implementats i provats, però de moment
+# queden desactivats: amb això a False només s'admet un signant per sol·licitud.
+# Per activar-ho no cal tocar codi, només posar MULTI_SIGNER_ENABLED=True.
+MULTI_SIGNER_ENABLED = config("MULTI_SIGNER_ENABLED", default=False, cast=bool)
+
 # Certificat PFX per al segellat opcional dels PDF (pyHanko)
 PFX_PASS = config("PFX_PASS", default="")
 PFX_PATH = config("PFX_PATH", default="")
