@@ -33,7 +33,12 @@ class IntegrationRequestLog(models.Model):
 
 
 class SigningSession(models.Model):
-    """Sessió de signatura oberta al proveïdor per a un `DocumentSign`."""
+    """
+    Sessió de signatura oberta al proveïdor per a **un signant**.
+
+    El proveïdor només accepta un destinatari per sessió, així que una
+    sol·licitud amb tres signants genera tres sessions consecutives.
+    """
 
     STATUS_PENDING = "pending"
     STATUS_SIGNED = "signed"
@@ -47,8 +52,8 @@ class SigningSession(models.Model):
         (STATUS_FAILED, "Failed"),
     ]
 
-    document_sign = models.ForeignKey(
-        "documentmanager.DocumentSign",
+    signer = models.ForeignKey(
+        "documentmanager.DocumentSignSigner",
         on_delete=models.CASCADE,
         related_name="signing_sessions",
     )
@@ -65,6 +70,12 @@ class SigningSession(models.Model):
     expires_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Correspondència entre els ids que el proveïdor assigna als documents de la
+    # sessió i els nostres `DocumentSignDocument`: {"<provider_doc_id>": <id>}.
+    # Sense això no sabríem a quin document nostre correspon cada PDF firmat que
+    # ens torna el webhook quan la sessió en porta més d'un.
+    document_map = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["-created_at"]

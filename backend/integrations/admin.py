@@ -12,6 +12,6 @@ class IntegrationRequestLogAdmin(admin.ModelAdmin):
 
 @admin.register(SigningSession)
 class SigningSessionAdmin(admin.ModelAdmin):
-    list_display = ("id", "session_id", "document_sign", "status", "recipient_email", "signed_at")
+    list_display = ("id", "session_id", "signer", "status", "recipient_email", "signed_at")
     list_filter = ("status",)
     search_fields = ("session_id", "external_reference", "recipient_email")

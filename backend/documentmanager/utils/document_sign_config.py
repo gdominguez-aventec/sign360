@@ -6,12 +6,13 @@ from django.conf import settings
 DOCUMENT_SIGN_REFERENCE_PREFIX = "sign360-"
 
 
-def build_external_reference(document_sign):
+def build_external_reference(signer):
     """
-    Referència que s'envia al proveïdor. Es fa servir el token (opac i únic) i
-    no l'id, perquè viatja per correu fins al signant.
+    Referència que s'envia al proveïdor. Identifica el **signant**, no la
+    sol·licitud: com que cada signant té la seva sessió, és l'única manera que
+    el webhook sàpiga de quin torn de la cadena està parlant.
     """
-    return f"{DOCUMENT_SIGN_REFERENCE_PREFIX}{document_sign.token}"
+    return f"{DOCUMENT_SIGN_REFERENCE_PREFIX}{signer.token}"
 
 
 def is_document_sign_enabled():

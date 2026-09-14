@@ -17,20 +17,24 @@ class DocumentSignFilter(django_filters.FilterSet):
     # `status` admet una llista separada per comes ("1,2") per encaixar amb els
     # filtres multiselecció del frontal.
     status = django_filters.CharFilter(method="filter_status")
+    signer_email = django_filters.CharFilter(
+        field_name="signers__email", lookup_expr="iexact", distinct=True
+    )
 
     class Meta:
         model = DocumentSign
-        fields = ["otp_email"]
+        fields = []
 
     def filter_search(self, queryset, name, value):
         if not value:
             return queryset
         return queryset.filter(
             Q(title__icontains=value)
-            | Q(otp_name__icontains=value)
-            | Q(otp_email__icontains=value)
             | Q(token__icontains=value)
-        )
+            | Q(signers__name__icontains=value)
+            | Q(signers__email__icontains=value)
+            | Q(documents__original_document__document_name__icontains=value)
+        ).distinct()
 
     def filter_status(self, queryset, name, value):
         if not value:

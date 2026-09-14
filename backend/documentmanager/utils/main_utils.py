@@ -29,6 +29,8 @@ def upload_document(
     service=Document.SERVICE_HDD,
     uploaded_by=None,
     content_type=None,
+    version=1,
+    parent_document=None,
 ):
     _check_service(service)
 
@@ -52,6 +54,8 @@ def upload_document(
         size=size,
         service=service,
         uploaded_by=uploaded_by,
+        version=version,
+        parent_document=parent_document,
     )
 
 

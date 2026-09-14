@@ -59,25 +59,20 @@ watch(search, () => {
   }, 350)
 })
 
+const signedCount = (item) =>
+  item.signers.filter((signer) => signer.status === SIGN_STATUS.SIGNED).length
+
 const sendToSign = async (item) => {
   sendingId.value = item.id
   try {
-    await $DocumentSignApiService.sendToSign(item.id)
-    toast.success(t('sign.sent_ok'))
+    const response = await $DocumentSignApiService.sendToSign(item.id)
+    toast.success(`${t('sign.sent_ok')} — ${response.sent_to}`)
     await load()
   } catch {
     // error ja notificat
   } finally {
     sendingId.value = null
   }
-}
-
-const download = (item) => {
-  const filename =
-    item.document_file_signed_detail?.document_name ||
-    item.document_file_detail?.document_name ||
-    `${item.token}.pdf`
-  return $DocumentSignApiService.download(item.id, filename)
 }
 
 const onUploaded = async () => {
@@ -123,7 +118,7 @@ onMounted(load)
           v-model="search"
           type="search"
           :placeholder="$t('common.search')"
-          class="rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 w-64"
+          class="rounded-md border-0 py-1.5 pl-8 pr-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 w-72"
         />
       </div>
 
@@ -142,12 +137,14 @@ onMounted(load)
       </button>
     </div>
 
-    <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div class="bg-white rounded-lg border border-gray-200 overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr class="text-left text-gray-500 uppercase tracking-wide">
             <th class="px-4 py-2 font-medium">{{ $t('sign.doc_title') }}</th>
-            <th class="px-4 py-2 font-medium">{{ $t('sign.signer') }}</th>
+            <th class="px-4 py-2 font-medium">{{ $t('sign.documents') }}</th>
+            <th class="px-4 py-2 font-medium">{{ $t('sign.signers') }}</th>
+            <th class="px-4 py-2 font-medium">{{ $t('sign.next_signer') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.status') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.created_at') }}</th>
             <th class="px-4 py-2 font-medium">{{ $t('sign.signed_at') }}</th>
@@ -156,12 +153,12 @@ onMounted(load)
         </thead>
         <tbody class="divide-y divide-gray-100">
           <tr v-if="loading">
-            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
               {{ $t('common.loading') }}
             </td>
           </tr>
           <tr v-else-if="items.length === 0">
-            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+            <td colspan="8" class="px-4 py-8 text-center text-gray-500">
               {{ $t('sign.empty') }}
             </td>
           </tr>
@@ -175,8 +172,19 @@ onMounted(load)
               </div>
             </td>
             <td class="px-4 py-2">
-              <div>{{ item.otp_name }}</div>
-              <div class="text-gray-500">{{ item.otp_email }}</div>
+              <span class="inline-flex items-center gap-1 text-gray-700">
+                <Icon name="fa6-regular:file-pdf" class="w-3 h-3 text-red-500" />
+                {{ item.documents_count }}
+              </span>
+            </td>
+            <td class="px-4 py-2 text-gray-700">
+              {{ signedCount(item) }} / {{ item.signers_count }}
+            </td>
+            <td class="px-4 py-2">
+              <span v-if="item.next_signer" class="text-gray-700">
+                {{ item.next_signer.order }}. {{ item.next_signer.name }}
+              </span>
+              <span v-else class="text-green-700">{{ $t('sign.all_signed') }}</span>
             </td>
             <td class="px-4 py-2">
               <span
@@ -199,18 +207,10 @@ onMounted(load)
                   <Icon name="fa6-regular:eye" class="w-3.5 h-3.5" />
                 </NuxtLink>
                 <button
-                  type="button"
-                  class="text-gray-500 hover:text-indigo-600"
-                  :title="$t('sign.download')"
-                  @click="download(item)"
-                >
-                  <Icon name="fa6-solid:download" class="w-3.5 h-3.5" />
-                </button>
-                <button
-                  v-if="canSend(item.status)"
+                  v-if="canSend(item.status) && item.next_signer"
                   type="button"
                   class="text-gray-500 hover:text-indigo-600 disabled:opacity-50"
-                  :title="item.status === SIGN_STATUS.PENDING ? $t('sign.send_to_sign') : $t('sign.resend')"
+                  :title="$t('sign.send_next')"
                   :disabled="sendingId === item.id"
                   @click="sendToSign(item)"
                 >
