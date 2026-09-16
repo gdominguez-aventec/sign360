@@ -32,17 +32,22 @@ if [ "$AVAILABLE_MB" -lt 2000 ]; then
     echo "ERROR: només queden ${AVAILABLE_MB} MB lliures; calen 2000 MB per refer el frontal." >&2
     exit 1
 fi
-cd "$ROOT/frontend"
-sudo -u "$USER_APP" npm ci --no-audit --no-fund
-sudo -u "$USER_APP" npm run build
+# El Node del sistema és el 20 (el que fa servir avsis) i el frontal en demana
+# 22, així que es fa servir el de l'usuari, instal·lat amb nvm.
+sudo -u "$USER_APP" -H bash -lc '
+    set -e
+    . "$HOME/.nvm/nvm.sh"
+    cd /var/www/sign360/frontend
+    npm ci --no-audit --no-fund
+    npm run build
+'
 
 echo "==> Reinici de serveis"
 systemctl restart sign360-backend.service
-sudo -u "$USER_APP" -H pm2 reload "$ROOT/deploy/ecosystem.config.cjs" --update-env
-sudo -u "$USER_APP" -H pm2 save
+systemctl restart sign360-frontend.service
 
 echo "==> Comprovació"
-sleep 3
+sleep 4
 curl -sf --unix-socket /run/sign360_backend.sock http://localhost/ >/dev/null \
     && echo "backend OK" || { echo "backend NO respon" >&2; exit 1; }
 curl -sf -o /dev/null http://127.0.0.1:3006/ \

@@ -1,9 +1,14 @@
 # Desplegament
 
 Sign360 es desplega **de forma nativa**, com `avsis-customers` al mateix
-servidor: gunicorn sobre un socket Unix amb systemd per al backend, PM2 per al
-frontal Nuxt i nginx al davant. No es fa servir Docker (els `Dockerfile` i el
-`docker-compose.yml` del repositori són per a desenvolupament local).
+servidor: gunicorn sobre un socket Unix per al backend i el servidor de Nuxt per
+al frontal, tots dos amb systemd, i nginx al davant. No es fa servir Docker (els
+`Dockerfile` i el `docker-compose.yml` del repositori són per a desenvolupament
+local).
+
+A diferència d'avsis, el frontal **no** va amb PM2 sinó amb systemd: necessita un
+Node propi (vegeu més avall) i PM2 no se'n surt, amb l'entorn de nvm, quan
+s'arrenca fora d'una sessió de login.
 
 ## Estructura al servidor
 
@@ -25,7 +30,7 @@ sincronitzades.
 | Peça | On |
 |---|---|
 | Backend | `sign360-backend.service` → `unix:/run/sign360_backend.sock` |
-| Frontal | PM2 `Sign360 Frontend` → `127.0.0.1:3006` |
+| Frontal | `sign360-frontend.service` → `127.0.0.1:3006` |
 | Base de dades | PostgreSQL de la màquina, base `sign360` |
 | Logs | `/var/log/sign360/`, `/var/log/nginx/sign360-*` |
 
@@ -65,6 +70,23 @@ Abans de refer el frontal comprova que hi hagi **2 GB lliures**: `npm ci` esborr
 `node_modules` abans de reinstal·lar-lo, i quedar-se sense disc a mitja
 reinstal·lació deixa el frontal trencat.
 
+## Versió de Node
+
+El servidor té **Node 20** al sistema, que és el que fa servir avsis, i no s'hi
+toca. El frontal de Sign360 necessita **Node 22**: `@nuxtjs/i18n` v9 (obligatori
+amb Nuxt 3.21, perquè la v8 no és compatible amb unhead v2) arrossega paquets que
+demanen `node >= 22`.
+
+La solució és un Node propi de l'usuari `sign360`, instal·lat amb nvm a
+`/home/sign360/.nvm`. `setup.sh` l'instal·la i `deploy.sh` el carrega abans de
+construir. La ruta al binari surt literalment a
+`sign360-frontend.service`: **si es canvia de versió de Node, cal actualitzar-la
+allà**.
+
+També cal **npm 11**: el `package-lock.json` està generat amb npm 11, i npm 10
+el considera desincronitzat (`npm ci` falla amb «Missing: unplugin@... from lock
+file»).
+
 ## Espai en disc
 
 És la limitació real d'aquesta màquina. Un desplegament de Sign360 ocupa uns
@@ -75,6 +97,11 @@ Convé comprovar-ho abans de cada desplegament:
 ```bash
 df -h /
 ```
+
+`deploy.sh` s'atura sol si queden menys de 2 GB lliures.
+
+El que més ocupa en aquesta màquina són les releases antigues d'avsis (el seu
+desplegament en guarda 6 i només n'usa una) i el cache de build de Docker.
 
 ## Celery
 
