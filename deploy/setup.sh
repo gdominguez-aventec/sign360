@@ -10,7 +10,7 @@ set -euo pipefail
 
 ROOT=/var/www/sign360
 USER_APP=sign360
-REPO="${REPO:-git@github.com:gdominguez-aventec/sign360.git}"
+REPO="${REPO:-git@github.com:AQUA360/sign360.git}"
 DB_NAME="${DB_NAME:-sign360}"
 DB_USER="${DB_USER:-sign360}"
 NODE_VERSION="${NODE_VERSION:-22}"
