@@ -70,6 +70,34 @@ Abans de refer el frontal comprova que hi hagi **2 GB lliures**: `npm ci` esborr
 `node_modules` abans de reinstal·lar-lo, i quedar-se sense disc a mitja
 reinstal·lació deixa el frontal trencat.
 
+## Accés temporal per IP (mentre no hi ha DNS)
+
+`nginx/sign360-ip.conf` publica l'aplicació a **http://37.27.209.18** sense
+domini ni HTTPS. Tot penja d'un sol origen: el frontal a l'arrel i l'API sota
+`/api/`, de manera que el navegador no fa cap petició entre orígens i la
+configuració de CORS no s'ha de tocar.
+
+Perquè funcioni calen dues coses més:
+
+- La IP afegida a `ALLOWED_HOSTS` i `CSRF_TRUSTED_ORIGINS` del `backend/.env`.
+- Un override de systemd a
+  `/etc/systemd/system/sign360-frontend.service.d/override.conf` amb
+  `NUXT_PUBLIC_API_HOST=http://37.27.209.18/api`. L'URL de l'API es llegeix en
+  temps d'execució, així que **no cal refer el build** per canviar-la.
+
+**Això és HTTP pla: les contrasenyes i els tokens viatgen sense xifrar.** És un
+arranjament provisional per poder ensenyar l'aplicació abans de tenir DNS, i
+s'ha de retirar quan entrin els vhosts amb domini:
+
+```bash
+rm /etc/nginx/sites-enabled/sign360-ip
+rm -r /etc/systemd/system/sign360-frontend.service.d
+systemctl daemon-reload && systemctl restart sign360-frontend.service
+systemctl reload nginx
+```
+
+I treure la IP de les dues variables del `backend/.env`.
+
 ## Versió de Node
 
 El servidor té **Node 20** al sistema, que és el que fa servir avsis, i no s'hi
