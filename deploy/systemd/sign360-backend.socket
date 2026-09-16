@@ -1,0 +1,11 @@
+[Unit]
+Description=Sign360 backend socket
+
+[Socket]
+ListenStream=/run/sign360_backend.sock
+SocketUser=www-data
+SocketGroup=www-data
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target

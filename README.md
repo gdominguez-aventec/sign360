@@ -175,7 +175,14 @@ La interfície ocupa el 100% de l'amplada de la pantalla.
 El visor mostra el PDF dins d'un `<iframe>` sobre un *blob*: l'endpoint demana el
 token a la capçalera i un `<iframe src>` no en pot enviar cap.
 
+## Desplegament
+
+A staging es desplega de forma nativa (gunicorn + systemd + PM2 + nginx), com
+`avsis-customers`. Vegeu [`deploy/README.md`](deploy/README.md).
+
 ## Docker
+
+Només per a desenvolupament local; el desplegament al servidor és natiu.
 
 ```bash
 cp backend/.env.example backend/.env
