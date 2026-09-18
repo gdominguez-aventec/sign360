@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB: ${DATABASE_NAME:-sign360}
-      POSTGRES_USER: ${DATABASE_USER:-sign360}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-sign360}
+      POSTGRES_DB: ${DATABASE_NAME:-app_aqua360_sign}
+      POSTGRES_USER: ${DATABASE_USER:-app_aqua360_sign}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-app_aqua360_sign}
     volumes:
       - db_data:/var/lib/postgresql/data
     ports:

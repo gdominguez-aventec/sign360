@@ -1,0 +1,26 @@
+[Unit]
+Description=app.aqua360-sign backend (gunicorn)
+After=network.target postgresql.service
+Requires=app-aqua360-sign-backend.socket
+
+[Service]
+Type=notify
+User=app-aqua360-sign
+Group=www-data
+WorkingDirectory=/var/www/app-aqua360-sign/backend
+Environment="PATH=/var/www/app-aqua360-sign/backend/env/bin"
+ExecStart=/var/www/app-aqua360-sign/backend/env/bin/gunicorn \
+    --workers 3 \
+    --timeout 300 \
+    --bind unix:/run/app_aqua360_sign_backend.sock \
+    --access-logfile /var/log/app-aqua360-sign/access.log \
+    --error-logfile /var/log/app-aqua360-sign/error.log \
+    config.wsgi:application
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

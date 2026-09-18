@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Primera instal·lació de Sign360 al servidor. S'executa una sola vegada, com a
+# Primera instal·lació d'app.aqua360-sign al servidor. S'executa un sol cop, com a
 # root. A partir d'aquí, les actualitzacions van amb `deploy.sh`.
 #
 # El que NO fa aquest script, a propòsit, perquè són decisions que ha de prendre
@@ -8,11 +8,11 @@
 # habilitar els vhosts d'nginx.
 set -euo pipefail
 
-ROOT=/var/www/sign360
-USER_APP=sign360
-REPO="${REPO:-git@github.com:AQUA360/sign360.git}"
-DB_NAME="${DB_NAME:-sign360}"
-DB_USER="${DB_USER:-sign360}"
+ROOT=/var/www/app-aqua360-sign
+USER_APP=app-aqua360-sign
+REPO="${REPO:-git@github.com:AQUA360/app-aqua360-sign.git}"
+DB_NAME="${DB_NAME:-app_aqua360_sign}"
+DB_USER="${DB_USER:-app_aqua360_sign}"
 NODE_VERSION="${NODE_VERSION:-22}"
 
 echo "==> Usuari de sistema"
@@ -20,8 +20,8 @@ id -u "$USER_APP" >/dev/null 2>&1 || adduser --system --group --shell /bin/bash 
 usermod -aG www-data "$USER_APP"
 
 echo "==> Directoris"
-mkdir -p "$ROOT" /var/log/sign360 "/home/$USER_APP"
-chown -R "$USER_APP:www-data" "$ROOT" /var/log/sign360 "/home/$USER_APP"
+mkdir -p "$ROOT" /var/log/app-aqua360-sign "/home/$USER_APP"
+chown -R "$USER_APP:www-data" "$ROOT" /var/log/app-aqua360-sign "/home/$USER_APP"
 
 echo "==> Clau de desplegament"
 # Clau pròpia de l'usuari, per poder fer `git pull` sense la clau de root.
@@ -64,14 +64,14 @@ sudo -u "$USER_APP" -H bash -lc "
 "
 
 echo "==> Serveis"
-cp "$ROOT/deploy/systemd/sign360-backend.socket"   /etc/systemd/system/
-cp "$ROOT/deploy/systemd/sign360-backend.service"  /etc/systemd/system/
-cp "$ROOT/deploy/systemd/sign360-frontend.service" /etc/systemd/system/
+cp "$ROOT/deploy/systemd/app-aqua360-sign-backend.socket"   /etc/systemd/system/
+cp "$ROOT/deploy/systemd/app-aqua360-sign-backend.service"  /etc/systemd/system/
+cp "$ROOT/deploy/systemd/app-aqua360-sign-frontend.service" /etc/systemd/system/
 systemctl daemon-reload
-systemctl enable sign360-backend.socket sign360-backend.service sign360-frontend.service
+systemctl enable app-aqua360-sign-backend.socket app-aqua360-sign-backend.service app-aqua360-sign-frontend.service
 
-cp "$ROOT/deploy/nginx/sign360-backend.conf"  /etc/nginx/sites-available/sign360-backend
-cp "$ROOT/deploy/nginx/sign360-frontend.conf" /etc/nginx/sites-available/sign360-frontend
+cp "$ROOT/deploy/nginx/app-aqua360-sign-backend.conf"  /etc/nginx/sites-available/app-aqua360-sign-backend
+cp "$ROOT/deploy/nginx/app-aqua360-sign-frontend.conf" /etc/nginx/sites-available/app-aqua360-sign-frontend
 
 cat <<'MSG'
 
@@ -79,17 +79,17 @@ Instal·lació base feta. Ara, a mà:
 
   1. Donar d'alta la deploy key de dalt al repositori de GitHub.
   2. Crear el rol de postgres amb contrasenya, si l'avís ho demanava:
-       sudo -u postgres psql -c "CREATE ROLE sign360 LOGIN PASSWORD '...'"
+       sudo -u postgres psql -c "CREATE ROLE app_aqua360_sign LOGIN PASSWORD '...'"
   3. Copiar backend/.env.example a backend/.env i omplir-lo (SECRET_KEY,
      DATABASE_*, ALLOWED_HOSTS, SIGNING_*).
-  4. Crear frontend/.env amb NUXT_PUBLIC_API_HOST=https://api-sign360.aqua360.cloud
+  4. Crear frontend/.env amb NUXT_PUBLIC_API_HOST=https://api-app-aqua360-sign.aqua360.cloud
   5. Donar d'alta els registres DNS a Cloudflare (proxied):
-       sign360.aqua360.cloud  i  api-sign360.aqua360.cloud
+       app-aqua360-sign.aqua360.cloud  i  api-app-aqua360-sign.aqua360.cloud
   6. Activar els vhosts i recarregar nginx:
-       ln -s /etc/nginx/sites-available/sign360-backend  /etc/nginx/sites-enabled/
-       ln -s /etc/nginx/sites-available/sign360-frontend /etc/nginx/sites-enabled/
+       ln -s /etc/nginx/sites-available/app-aqua360-sign-backend  /etc/nginx/sites-enabled/
+       ln -s /etc/nginx/sites-available/app-aqua360-sign-frontend /etc/nginx/sites-enabled/
        nginx -t && systemctl reload nginx
   7. Executar el desplegament:
-       /var/www/sign360/deploy/deploy.sh
+       /var/www/app-aqua360-sign/deploy/deploy.sh
 
 MSG

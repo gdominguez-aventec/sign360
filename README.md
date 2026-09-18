@@ -1,6 +1,6 @@
-# Sign360
+# app.aqua360-sign
 
-**Sign360 is a standalone web application for reviewing, uploading and
+**app.aqua360-sign is a standalone web application for reviewing, uploading and
 electronically signing documents.** Users upload one or more PDFs, list the
 people who must sign them, and the documents are sent out for signature through
 an external signing provider, which delivers a one-time password to each signer
@@ -11,29 +11,39 @@ signatures.
 Nothing is ever overwritten. The file we received is stored untouched, and each
 signature is saved as a new version linked to the one before it, so the original,
 every intermediate step and the fully signed result all remain available for
-download. Sign360 tracks each request and each signer through its lifecycle —
+download. app.aqua360-sign tracks each request and each signer through its lifecycle —
 pending, sent, signed, expired or failed — and logs every exchange with the
 provider, giving a full audit trail of who was asked to sign what, and when.
 
 The application is built with Django and Django REST Framework on the back end
-and Nuxt 3 (Vue 3) on the front end, following the same conventions as the
+and Nuxt 4 (Vue 3) on the front end, following the same conventions as the
 Aqua360 Customers platform. It runs on its own database with its own users and
 has no runtime dependency on any other Aventec system.
 
 ---
 
 Segueix les mateixes convencions que `avsis-customers-backend` /
-`avsis-customers-frontend`: Django + DRF al backend i Nuxt 3 (Vue 3) al frontal.
+`avsis-customers-frontend`: Django + DRF al backend i Nuxt 4 (Vue 3) al frontal.
 
 És un projecte **autònom**: té la seva base de dades i els seus usuaris, i no
 depèn de la instal·lació d'avsis. L'única dependència externa és l'API de
 signatura (Aqua360 Sign), la mateixa que fa servir avsis.
 
 ```
-sign360/
+app.aqua360-sign/
 ├── backend/     Django 5 + DRF + PostgreSQL + Celery
-└── frontend/    Nuxt 3 + Tailwind + Pinia + i18n
+└── frontend/    Nuxt 4 + Tailwind + Pinia + i18n (Node 22)
 ```
+
+El projecte es deia **Sign360** i el repositori, `AQUA360/sign360`; ara és
+`AQUA360/app-aqua360-sign`. Dins del codi, el paquet de Django és `config` i
+l'app d'autenticació `accounts`, i els serveis, la base de dades, els dominis i
+els vhosts es diuen `app-aqua360-sign` / `app_aqua360_sign` (vegeu
+[`deploy/README.md`](deploy/README.md)).
+
+`app.aqua360-sign` és **el client**; `aqua360-sign` (`sign.aqua360`) és el
+proveïdor de signatura amb qui parla per API. Són dos productes i dos
+repositoris separats, i es despleguen per separat.
 
 ## Com funciona la signatura
 
@@ -153,8 +163,12 @@ original: és una garantia addicional i no pot fer caure el flux de signatura.
 
 ## Frontend
 
+Cal **Node 22** (Nuxt 4 declara `engines.node: ^22.19.0 || ^24.11.0 || >=26`);
+l'`.nvmrc` del frontal ja el fixa.
+
 ```bash
 cd frontend
+nvm use
 npm install
 cp .env.example .env        # NUXT_PUBLIC_API_HOST cap al backend
 npm run dev

@@ -65,7 +65,7 @@ def seal_pdf(pdf_bytes):
             cert_path, passphrase=cert_password.encode("utf-8") if cert_password else None
         )
         signature_meta = signers.PdfSignatureMetadata(
-            field_name="Sign360Seal",
+            field_name="AppAqua360SignSeal",
             md_algorithm="sha256",
             subfilter=SigSeedSubFilter.PADES,
             validation_context=ValidationContext(allow_fetching=True),

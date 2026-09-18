@@ -3,7 +3,11 @@ from django.conf import settings
 # Prefix per a l'`external_reference` de les sessions de signatura, per evitar
 # col·lisions amb l'id numèric de qualsevol altra entitat que el proveïdor
 # pugui fer servir com a referència.
-DOCUMENT_SIGN_REFERENCE_PREFIX = "sign360-"
+DOCUMENT_SIGN_REFERENCE_PREFIX = "app-aqua360-sign-"
+
+# Prefix que fèiem servir quan l'aplicació es deia Sign360. Les sessions obertes
+# abans del canvi de nom encara el porten, i el webhook les ha de poder resoldre.
+LEGACY_REFERENCE_PREFIXES = ("sign360-",)
 
 
 def build_external_reference(signer):

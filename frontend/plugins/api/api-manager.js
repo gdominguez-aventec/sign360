@@ -29,7 +29,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const apiService = {
     getToken() {
-      if (!process.client) return ''
+      if (!import.meta.client) return ''
       return localStorage.getItem('auth_token') || ''
     },
 
@@ -60,7 +60,7 @@ export default defineNuxtPlugin((nuxtApp) => {
             toast.error(message)
             last401ToastTime = now
           }
-          if (process.client) localStorage.removeItem('auth_token')
+          if (import.meta.client) localStorage.removeItem('auth_token')
           nuxtApp.$router.push('/auth/login')
         } else if (!suppressToast) {
           toast.error(message)
@@ -76,7 +76,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       const response = await fetch(url, { headers: this.buildHeaders() })
       if (!response.ok) {
         if (response.status === 401) {
-          if (process.client) localStorage.removeItem('auth_token')
+          if (import.meta.client) localStorage.removeItem('auth_token')
           nuxtApp.$router.push('/auth/login')
         }
         throw new Error(`HTTP ${response.status}`)
