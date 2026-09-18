@@ -1,8 +1,8 @@
 [Unit]
-Description=Sign360 backend socket
+Description=app.aqua360-sign backend socket
 
 [Socket]
-ListenStream=/run/sign360_backend.sock
+ListenStream=/run/app_aqua360_sign_backend.sock
 SocketUser=www-data
 SocketGroup=www-data
 SocketMode=0660

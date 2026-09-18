@@ -9,7 +9,10 @@ from documentmanager.models import (
     DocumentSignSignature,
     DocumentSignSigner,
 )
-from documentmanager.utils.document_sign_config import DOCUMENT_SIGN_REFERENCE_PREFIX
+from documentmanager.utils.document_sign_config import (
+    DOCUMENT_SIGN_REFERENCE_PREFIX,
+    LEGACY_REFERENCE_PREFIXES,
+)
 from documentmanager.utils.main_utils import get_default_service, upload_document
 from integrations.models import IntegrationRequestLog, SigningSession
 from integrations.outbound.signing.client import SigningClient
@@ -40,8 +43,10 @@ def _resolve_signer(external_reference):
     ref = (external_reference or "").strip()
     if not ref:
         return None
-    if ref.startswith(DOCUMENT_SIGN_REFERENCE_PREFIX):
-        ref = ref[len(DOCUMENT_SIGN_REFERENCE_PREFIX):]
+    for prefix in (DOCUMENT_SIGN_REFERENCE_PREFIX, *LEGACY_REFERENCE_PREFIXES):
+        if ref.startswith(prefix):
+            ref = ref[len(prefix):]
+            break
     signer = DocumentSignSigner.objects.filter(token=ref).first()
     if signer:
         return signer

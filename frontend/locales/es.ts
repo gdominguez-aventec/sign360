@@ -1,6 +1,6 @@
 export default {
   app: {
-    name: 'Sign360',
+    name: 'app.aqua360-sign',
     subtitle: 'Gestión y firma de documentos',
   },
   common: {

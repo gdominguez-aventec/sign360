@@ -1,7 +1,7 @@
 const isAuthenticated = () => localStorage.getItem('auth_token') !== null
 
 export default defineNuxtRouteMiddleware((to) => {
-  if (!process.client) return
+  if (!import.meta.client) return
 
   const no_auth_paths = ['/auth/login', '/auth/logout']
   if (no_auth_paths.includes(to.path)) return

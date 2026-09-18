@@ -6,9 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from auth_sign360.filters import GroupFilter, UserFilter
-from auth_sign360.permissions import PermissionManager
-from auth_sign360.serializers import GroupSerializer, UserSerializer
+from accounts.filters import GroupFilter, UserFilter
+from accounts.permissions import PermissionManager
+from accounts.serializers import GroupSerializer, UserSerializer
 
 
 class CustomAuthToken(ObtainAuthToken):

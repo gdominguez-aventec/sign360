@@ -1,0 +1,22 @@
+[Unit]
+Description=app.aqua360-sign frontend (Nuxt)
+After=network.target
+
+[Service]
+Type=simple
+User=app-aqua360-sign
+Group=www-data
+WorkingDirectory=/var/www/app-aqua360-sign/frontend
+Environment=NODE_ENV=production
+Environment=HOST=127.0.0.1
+Environment=PORT=3006
+# Node propi de l'usuari (nvm): el del sistema és el 20 i el frontal en demana 22.
+# Si es canvia de versió de Node, cal actualitzar aquesta ruta.
+ExecStart=/home/app-aqua360-sign/.nvm/versions/node/v22.23.2/bin/node /var/www/app-aqua360-sign/frontend/.output/server/index.mjs
+Restart=on-failure
+RestartSec=5
+StandardOutput=append:/var/log/app-aqua360-sign/frontend.log
+StandardError=append:/var/log/app-aqua360-sign/frontend-error.log
+
+[Install]
+WantedBy=multi-user.target
